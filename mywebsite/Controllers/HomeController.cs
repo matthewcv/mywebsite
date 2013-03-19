@@ -6,17 +6,9 @@ using System.Web.Mvc;
 
 namespace mywebsite.Controllers
 {
-    public interface IHomeService
-    {
-    }
-
-    public class HomeService : IHomeService
-    {
-    }
-
     public class HomeController : Controller
     {
-        public HomeController(IHomeService service)
+        public HomeController()
         {
         }
 

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace mywebsite.backend
 {
-    public class OAuthUser
+    public class LoginResponse
     {
-        public string Id { get; set; }
-        public string Provider { get; set; }
-        public string ProviderUserId { get; set; }
+        public bool NewProfileCreated { get; set; }
+
+        public Profile Profile { get; set; }
     }
 }
