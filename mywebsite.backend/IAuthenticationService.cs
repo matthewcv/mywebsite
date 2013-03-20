@@ -18,5 +18,7 @@ namespace mywebsite.backend
         LoginResponse Login(AuthenticationResult authResult);
 
         OAuthIdentity FindOAuthIdentity(string provider, string providerUserId);
+
+        Profile CurrentProfile { get; }
     }
 }

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace mywebsite.backend
 {
     public class Profile
     {
+        private IList<OAuthIdentity> _oAuthIdentities;
         public int Id { get; set; }
         /// <summary>
         /// the profile's display name for the site
@@ -18,13 +20,19 @@ namespace mywebsite.backend
 
         public string Location { get; set; }
 
-        /// <summary>
-        /// a system generated unique name for this profile.
-        /// </summary>
-        public string UniqueName { get; set; }
+        [JsonIgnore]
+        public bool IsGuest { get; set; }
 
-        [Newtonsoft.Json.JsonIgnore]
-        public IList<OAuthIdentity> OAuthIdentities { get; set; } 
+        [JsonIgnore]
+        public IList<OAuthIdentity> OAuthIdentities
+        {
+            get { return _oAuthIdentities ?? (_oAuthIdentities = new List<OAuthIdentity>()); }
+            set { _oAuthIdentities = value; }
+        }
 
+        internal static Profile GuestProfile()
+        {
+            return new Profile() {IsGuest = true, DisplayName = "Friend"};
+        }
     }
 }

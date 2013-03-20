@@ -18,6 +18,10 @@ namespace mywebsite.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        private class SessionKeys
+        {
+            public const string CreateProfile = "CreateProfile";
+        }
         private readonly IAuthenticationService _authService;
 
         public AccountController(IAuthenticationService authService)
@@ -32,26 +36,60 @@ namespace mywebsite.Controllers
         [AllowAnonymous]
         public ActionResult Login()
         {
-            
             return View(_authService.OAuthClients);
         }
 
         [AllowAnonymous]
         public ActionResult RequestAuth(string provider)
         {
-
-            return new OAuthRequestActionResult(_authService.GetSecurityManager(provider),Url.Action("RequestAuthCallback"));
+            if (Request.IsAuthenticated)
+            {
+                return View("Login");
+            }
+            return new OAuthRequestActionResult(_authService.GetSecurityManager(provider), Url.Action("RequestAuthCallback"));
         }
         [AllowAnonymous]
         public ActionResult RequestAuthCallback()
         {
+            if (Request.IsAuthenticated)
+            {
+                return View("Login");
+            }
+
             string providerName = OpenAuthSecurityManager.GetProviderName(HttpContext);
             OpenAuthSecurityManager m = _authService.GetSecurityManager(providerName);
             AuthenticationResult verifyAuthentication = m.VerifyAuthentication(Url.Action("RequestAuthCallback"));
 
+            if (verifyAuthentication.IsSuccessful)
+            {
+                LoginResponse loginResponse = _authService.Login(verifyAuthentication);
+                if (loginResponse.NewProfileCreated)
+                {
+                    Session[SessionKeys.CreateProfile] = true;
+                    return RedirectToAction("Edit");
+                }
+            }
+
+
+            return RedirectToAction("Login");
+        }
+
+        public ActionResult Edit()
+        {
             
-            
-            return null;
+            if (Session[SessionKeys.CreateProfile] != null)
+            {
+                ViewBag.CreateProfile = true;
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Profile profile)
+        {
+
+
+            return View();
         }
 
 
@@ -62,7 +100,8 @@ namespace mywebsite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-
+            FormsAuthentication.SignOut();
+            Session.Clear();
             return RedirectToAction("Index", "Home");
         }
     }

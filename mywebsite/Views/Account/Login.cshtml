@@ -4,17 +4,24 @@
     
 }
 
-<hgroup class="title">
-    <h1>@ViewBag.Title.</h1>
-</hgroup>
-<ul>
-    @foreach (IAuthenticationClient client in Model)
-    {
-        <li>@Html.ActionLink(client.ProviderName, "RequestAuth",new {provider = client.ProviderName})</li>
-    }
-</ul>
 
+@if (Request.IsAuthenticated)
+{
+<text>you are logged in to the system.</text>
+}
+else
+{
+    <hgroup class="title">
+        <h1>@ViewBag.Title.</h1>
+    </hgroup>
+    <ul>
+        @foreach (IAuthenticationClient client in Model)
+        {
+            <li>@Html.ActionLink(client.ProviderName, "RequestAuth", new {provider = client.ProviderName})</li>
+        }
+    </ul>
 
+}
 
 @section Scripts {
     

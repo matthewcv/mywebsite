@@ -10,17 +10,15 @@ using Raven.Client;
 
 namespace mywebsite.backend
 {
-    public class AuthenticationService:IAuthenticationService
+    public class AuthenticationService : IAuthenticationService, IOpenAuthDataProvider
     {
         private readonly HttpContextBase _httpContext;
-        private readonly IOpenAuthDataProvider _oauthDataProvider;
         private readonly IDocumentSession _docSess;
         private List<IAuthenticationClient> _oAuthClients;
 
-        public AuthenticationService(HttpContextBase httpContext, IOpenAuthDataProvider oauthDataProvider, IDocumentSession docSess)
+        public AuthenticationService(HttpContextBase httpContext, IDocumentSession docSess)
         {
             _httpContext = httpContext;
-            _oauthDataProvider = oauthDataProvider;
             _docSess = docSess;
             _oAuthClients = new List<IAuthenticationClient>();
         }
@@ -43,7 +41,7 @@ namespace mywebsite.backend
 
         public OpenAuthSecurityManager GetSecurityManager(string providerName)
         {
-            return new OpenAuthSecurityManager(_httpContext,GetClient(providerName),_oauthDataProvider);
+            return new OpenAuthSecurityManager(_httpContext,GetClient(providerName),this);
         }
 
         public LoginResponse Login(AuthenticationResult authResult)
@@ -62,7 +60,7 @@ namespace mywebsite.backend
 
                 Profile newP = new Profile();
                 newP.DisplayName = authResult.UserName;
-
+                newP.EmailAddress = authResult.ExtraData["email"];
                 _docSess.Store(newP);
 
                 newId.ProfileId = newP.Id;
@@ -77,11 +75,32 @@ namespace mywebsite.backend
             {
                 lr.Profile = GetProfile(oai.ProfileId);
             }
-
+            
             FormsAuthentication.SetAuthCookie(_docSess.Advanced.GetDocumentId(lr.Profile),true);
 
             return lr;
         }
+        public Profile CurrentProfile
+        {
+            get
+            {
+                if (_httpContext.User.Identity.IsAuthenticated)
+                {
+                    string id = _httpContext.User.Identity.Name;
+                    string[] strings =
+                        id.Split(new string[] {_docSess.Advanced.DocumentStore.Conventions.IdentityPartsSeparator},
+                                 StringSplitOptions.RemoveEmptyEntries);
+                    int iid;
+                    if (strings.Length > 0 && int.TryParse(strings.Last(), out iid))
+                    {
+                        return GetProfile(iid);
+                    }
+                    throw new Exception("invalid ID format " + id);
+                }
+                return Profile.GuestProfile();
+            }
+        }
+
 
         public Profile GetProfile(int id)
         {
@@ -117,6 +136,25 @@ namespace mywebsite.backend
 
             _docSess.SaveChanges();
         }
+
+        public string GetUserNameFromOpenAuth(string openAuthProvider, string openAuthId)
+        {
+            var oid = _docSess.Query<OAuthIdentity>().FirstOrDefault(i => i.Provider == openAuthProvider && i.ProviderUserId == openAuthId);
+
+            if (oid == null)
+            {
+                return null;
+            }
+
+            var profile = _docSess.Load<Profile>(oid.ProfileId);
+            if (profile == null)
+            {
+                return null;
+            }
+
+            return _docSess.Advanced.GetDocumentId(profile);
+        }
+
 
     }
 }

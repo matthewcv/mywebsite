@@ -62,6 +62,8 @@ using Raven.Client.Document;
         {
             kernel.Load<RavenDbModule>();
             kernel.Load<AuthenticationModule>();
+            
+
         }
     
 

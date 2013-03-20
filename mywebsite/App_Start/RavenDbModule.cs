@@ -21,7 +21,14 @@ namespace mywebsite.App_Start
 
             Bind<IDocumentSession>()
                 .ToMethod(c => c.Kernel.Get<IDocumentStore>().OpenSession())
-                .InRequestScope();
+                .InRequestScope()
+                .OnDeactivation((c, d) =>
+                    {
+                        if (d.Advanced.HasChanges)
+                        {
+                            d.SaveChanges();
+                        }
+                    });
         }
 
 
