@@ -1,4 +1,6 @@
+using FluentValidation;
 using mywebsite.backend;
+using mywebsite.backend.Validation;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof(mywebsite.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivator.ApplicationShutdownMethodAttribute(typeof(mywebsite.App_Start.NinjectWebCommon), "Stop")]
@@ -62,7 +64,7 @@ using Raven.Client.Document;
         {
             kernel.Load<RavenDbModule>();
             kernel.Load<AuthenticationModule>();
-            
+            kernel.Load<ValidationModule>();
 
         }
     

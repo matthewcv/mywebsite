@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using DotNetOpenAuth.AspNet;
 using DotNetOpenAuth.AspNet.Clients;
+using FluentValidation;
 using Ninject;
 using Ninject.Activation;
 using Ninject.Modules;

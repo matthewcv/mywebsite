@@ -434,6 +434,12 @@ input, textarea {
     width: 300px;
 }
 
+input.invalid
+{
+    border-color: #FF0000;
+    background-color: #FFD5D5;
+}
+
 textarea {
     font-family: inherit;
     width: 500px;
@@ -590,41 +596,48 @@ tr.pager td {
 /********************
 *   Mobile Styles   *
 ********************/
-@media only screen and (max-width: 850px) {
+@media only screen and (max-width: 850px)
+{
 
     /* header
     ----------------------------------------------------------*/
     header .float-left,
-    header .float-right {
+    header .float-right
+    {
         float: none;
     }
 
     /* logo */
-    header .site-title {
+    header .site-title
+    {
         margin: 10px;
         text-align: center;
     }
 
     /* login */
-    #login {
+    #login
+    {
         font-size: .85em;
         margin: 0 0 12px;
         text-align: center;
     }
 
-        #login ul {
+        #login ul
+        {
             margin: 5px 0;
             padding: 0;
         }
 
-        #login li {
+        #login li
+        {
             display: inline;
             list-style: none;
             margin: 0;
             padding: 0;
         }
 
-        #login a {
+        #login a
+        {
             background: none;
             color: #999;
             font-weight: 600;
@@ -632,22 +645,26 @@ tr.pager td {
             padding: 0;
         }
 
-        #login a:hover {
-            color: #333;
-        }
+            #login a:hover
+            {
+                color: #333;
+            }
 
     /* menu */
-    nav {
+    nav
+    {
         margin-bottom: 5px;
     }
 
-    ul#menu {
+    ul#menu
+    {
         margin: 0;
         padding: 0;
         text-align: center;
     }
 
-        ul#menu li {
+        ul#menu li
+        {
             margin: 0;
             padding: 0;
         }
@@ -656,32 +673,38 @@ tr.pager td {
     /* main layout
     ----------------------------------------------------------*/
     .main-content,
-    .featured + .main-content {
+    .featured + .main-content
+    {
         background-position: 10px 0;
     }
 
-    .content-wrapper {
+    .content-wrapper
+    {
         padding-right: 10px;
         padding-left: 10px;
     }
 
-    .featured .content-wrapper {
+    .featured .content-wrapper
+    {
         padding: 10px;
     }
 
     /* page content */
-    article, aside {
+    article, aside
+    {
         float: none;
         width: 100%;
     }
 
     /* ordered list */
-    ol.round {
+    ol.round
+    {
         list-style-type: none;
         padding-left: 0;
     }
 
-        ol.round li {
+        ol.round li
+        {
             padding-left: 10px;
             margin: 25px 0;
         }
@@ -695,18 +718,21 @@ tr.pager td {
             ol.round li.six,
             ol.round li.seven,
             ol.round li.eight,
-            ol.round li.nine {
+            ol.round li.nine
+            {
                 background: none;
             }
 
-     /* features */
-     section.feature {
+    /* features */
+    section.feature
+    {
         float: none;
         padding: 10px;
         width: auto;
-     }
+    }
 
-        section.feature img {
+        section.feature img
+        {
             color: #999;
             content: attr(alt);
             font-size: 1.5em;
@@ -714,23 +740,27 @@ tr.pager td {
         }
 
     /* forms */
-    input {
+    input
+    {
         width: 90%;
     }
 
     /* login page */
-    #loginForm {
+    #loginForm
+    {
         border-right: none;
         float: none;
         width: auto;
     }
 
-        #loginForm .validation-error {
+        #loginForm .validation-error
+        {
             display: block;
             margin-left: 15px;
         }
 
-    #socialLoginForm {
+    #socialLoginForm
+    {
         margin-left: 0;
         float: none;
         width: auto;
@@ -740,17 +770,22 @@ tr.pager td {
     /* footer
     ----------------------------------------------------------*/
     footer .float-left,
-    footer .float-right {
+    footer .float-right
+    {
         float: none;
     }
 
-    footer {
+    footer
+    {
         text-align: center;
         height: auto;
         padding: 10px 0;
     }
 
-        footer p {
+        footer p
+        {
             margin: 0;
         }
 }
+
+

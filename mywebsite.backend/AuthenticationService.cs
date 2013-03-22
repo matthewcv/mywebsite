@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Security;
 using DotNetOpenAuth.AspNet;
+using FluentValidation;
+using FluentValidation.Results;
 using Raven.Client;
 
 namespace mywebsite.backend
@@ -121,21 +123,13 @@ namespace mywebsite.backend
             return oid;
         }
 
-        public void SaveOAuthIdentity(OAuthIdentity identity)
+        public void UpdateCurrentProfile(Profile profile)
         {
-            OAuthIdentity found = FindOAuthIdentity(identity.Provider, identity.ProviderUserId);
-            if (found == null)
-            {
-                found = identity;
-                _docSess.Store(found);
-            }
-            else
-            {
-
-            }
-
-            _docSess.SaveChanges();
+            CurrentProfile.DisplayName = profile.DisplayName;
+            CurrentProfile.EmailAddress = profile.EmailAddress;
+            CurrentProfile.Location = profile.Location;
         }
+
 
         public string GetUserNameFromOpenAuth(string openAuthProvider, string openAuthId)
         {

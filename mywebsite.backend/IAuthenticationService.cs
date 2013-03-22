@@ -20,5 +20,6 @@ namespace mywebsite.backend
         OAuthIdentity FindOAuthIdentity(string provider, string providerUserId);
 
         Profile CurrentProfile { get; }
+        void UpdateCurrentProfile(Profile profile);
     }
 }

@@ -68,30 +68,45 @@ namespace mywebsite.Controllers
                     Session[SessionKeys.CreateProfile] = true;
                     return RedirectToAction("Edit");
                 }
+                return RedirectToAction("Index", "Home");
             }
 
 
             return RedirectToAction("Login");
         }
-
+        
         public ActionResult Edit()
         {
             
             if (Session[SessionKeys.CreateProfile] != null)
             {
                 ViewBag.CreateProfile = true;
+                Session.Remove(SessionKeys.CreateProfile);
             }
-            return View();
+            
+            return View(_authService.CurrentProfile);
         }
 
         [HttpPost]
         public ActionResult Edit(Profile profile)
         {
-
-
-            return View();
+            if (ModelState.IsValid)
+            {
+                _authService.UpdateCurrentProfile(profile);
+                return SaveSuccess();
+            }
+            return ModelValidationErrors();
         }
 
+        private ActionResult SaveSuccess()
+        {
+            return Json(new {SaveSuccess = true});
+        }
+
+        private ActionResult ModelValidationErrors()
+        {
+            return Json(new { SaveSuccess = false, Errors = ModelState.Where(s => s.Value.Errors.Any()).SelectMany(s => s.Value.Errors.Select(e => e.ErrorMessage)) });
+        }
 
         //
         // POST: /Account/LogOff
