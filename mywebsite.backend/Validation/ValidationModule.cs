@@ -7,6 +7,7 @@ using FluentValidation;
 using Ninject;
 using Ninject.Modules;
 using Ninject.Web.Common;
+using mywebsite.backend.Entity;
 
 namespace mywebsite.backend.Validation
 {

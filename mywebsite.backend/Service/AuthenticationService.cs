@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Security;
 using DotNetOpenAuth.AspNet;
-using FluentValidation;
-using FluentValidation.Results;
 using Raven.Client;
+using mywebsite.backend.Entity;
 
-namespace mywebsite.backend
+namespace mywebsite.backend.Service
 {
     public class AuthenticationService : IAuthenticationService, IOpenAuthDataProvider
     {
@@ -23,6 +20,11 @@ namespace mywebsite.backend
             _httpContext = httpContext;
             _docSess = docSess;
             _oAuthClients = new List<IAuthenticationClient>();
+
+            if (!CurrentProfile.IsGuest)
+            {
+                CurrentProfile.LastActivity = DateTime.UtcNow;
+            }
         }
 
         public IList<IAuthenticationClient> OAuthClients
@@ -46,6 +48,33 @@ namespace mywebsite.backend
             return new OpenAuthSecurityManager(_httpContext,GetClient(providerName),this);
         }
 
+        public void AddAuthToCurrentProfile(AuthenticationResult verifyAuthentication)
+        {
+            if (CurrentProfile == null || !verifyAuthentication.IsSuccessful)
+            {
+                throw new Exception("Can't do that now");
+            }
+
+            //get or create the oauth identity.
+            OAuthIdentity findOAuthIdentity = FindOAuthIdentity(verifyAuthentication.Provider, verifyAuthentication.ProviderUserId);
+            if (findOAuthIdentity != null)
+            {
+                //somebody already exists. add this identity to the current profile and delete the old profile.
+                Profile old = GetProfile(findOAuthIdentity.ProfileId);
+                findOAuthIdentity.ProfileId = CurrentProfile.Id;
+                _docSess.Delete(old); //not for sure if I really want to fully delete this profile, save it or attempt to merge data.
+            }
+            else
+            {
+                OAuthIdentity newid = new OAuthIdentity();
+                newid.ProfileId = CurrentProfile.Id;
+                newid.Provider = verifyAuthentication.Provider;
+                newid.ProviderUserId = verifyAuthentication.ProviderUserId;
+                newid.CreatedDate = DateTime.UtcNow;
+                _docSess.Store(newid);
+            }
+        }
+
         public LoginResponse Login(AuthenticationResult authResult)
         {
             if (authResult.IsSuccessful == false)
@@ -59,10 +88,14 @@ namespace mywebsite.backend
                 OAuthIdentity newId = new OAuthIdentity();
                 newId.Provider = authResult.Provider;
                 newId.ProviderUserId = authResult.ProviderUserId;
+                newId.IsCurrent = true;
+                newId.LastLogin = DateTime.UtcNow;
+                newId.CreatedDate = DateTime.UtcNow;
 
                 Profile newP = new Profile();
                 newP.DisplayName = authResult.UserName;
-                newP.EmailAddress = authResult.ExtraData["email"];
+                newP.EmailAddress = authResult.UserName;
+                newP.LastActivity = newP.CreatedDate = DateTime.UtcNow;
                 _docSess.Store(newP);
 
                 newId.ProfileId = newP.Id;
@@ -75,6 +108,8 @@ namespace mywebsite.backend
             }
             else
             {
+                oai.LastLogin = DateTime.UtcNow;
+                oai.IsCurrent = true;
                 lr.Profile = GetProfile(oai.ProfileId);
             }
             
@@ -82,23 +117,33 @@ namespace mywebsite.backend
 
             return lr;
         }
+
+        private Profile _currentProfile = null;
         public Profile CurrentProfile
         {
             get
             {
                 if (_httpContext.User.Identity.IsAuthenticated)
                 {
-                    string id = _httpContext.User.Identity.Name;
-                    string[] strings =
-                        id.Split(new string[] {_docSess.Advanced.DocumentStore.Conventions.IdentityPartsSeparator},
-                                 StringSplitOptions.RemoveEmptyEntries);
-                    int iid;
-                    if (strings.Length > 0 && int.TryParse(strings.Last(), out iid))
+                    if (_currentProfile == null)
                     {
-                        return GetProfile(iid);
+                        string id = _httpContext.User.Identity.Name;
+                        string[] strings =
+                            id.Split(new string[] {_docSess.Advanced.DocumentStore.Conventions.IdentityPartsSeparator},
+                                     StringSplitOptions.RemoveEmptyEntries);
+                        int iid;
+                        if (strings.Length > 0 && int.TryParse(strings.Last(), out iid))
+                        {
+                            _currentProfile = GetProfile(iid);
+                        }
+                        else
+                        {
+                            throw new Exception("invalid ID format " + id);
+                        }
                     }
-                    throw new Exception("invalid ID format " + id);
+                    return _currentProfile;
                 }
+
                 return Profile.GuestProfile();
             }
         }
@@ -107,8 +152,10 @@ namespace mywebsite.backend
         public Profile GetProfile(int id)
         {
             var profile = _docSess.Load<Profile>(id);
-            profile.OAuthIdentities = _docSess.Query<OAuthIdentity>().Where(o => o.ProfileId == id).ToList();
-
+            if (profile != null)
+            {
+                profile.OAuthIdentities = _docSess.Query<OAuthIdentity>().Where(o => o.ProfileId == id).ToList();
+            }
             return profile;
         }
 

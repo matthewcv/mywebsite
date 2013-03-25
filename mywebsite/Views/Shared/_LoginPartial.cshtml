@@ -1,10 +1,18 @@
 ﻿@if (Request.IsAuthenticated) {
+    
+    
+    
     <text>
-        Hello, @Html.ActionLink(CurrentProfile.DisplayName, "Edit", "Account", routeValues: null, htmlAttributes: new { @class = "username", title = "Manage" })!
-        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" })) {
+        @Html.GravatarImage(CurrentProfile.EmailAddress)
+        <ul style="float:left">
+            <li>Hello, @Html.ActionLink(CurrentProfile.DisplayName, "Edit", "Account", routeValues: null, htmlAttributes: new { @class = "username", title = "Manage" })</li>
+            <li>        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" })) {
             @Html.AntiForgeryToken()
             <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
         }
+</li>
+        </ul>
+        
     </text>
 } else {
     <ul>

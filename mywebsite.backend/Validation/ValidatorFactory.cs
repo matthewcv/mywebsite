@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Ninject;
 using Ninject.Parameters;
+using Ninject.Planning.Bindings;
 
 namespace mywebsite.backend.Validation
 {
@@ -20,8 +21,12 @@ namespace mywebsite.backend.Validation
 
         public override IValidator CreateInstance(Type validatorType)
         {
-            var instance = (IValidator) _kernel.Get(validatorType, new IParameter[0]);
-            return instance;
+            if (((IList<IBinding>)_kernel.GetBindings(validatorType)).Count == 0)
+            {
+                return null;
+            }
+
+            return _kernel.Get(validatorType) as IValidator;
         }
     }
 }

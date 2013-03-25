@@ -21,7 +21,11 @@
             .extend({ validate: { required: "I need to know your name." } });
         this.Location = ko.observable();
     };
-    
+
+
+    window.account.oauthIdentity = function() {
+
+    };    
 
     
 })();

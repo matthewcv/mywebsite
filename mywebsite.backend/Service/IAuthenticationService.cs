@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using DotNetOpenAuth.AspNet;
+using mywebsite.backend.Entity;
 
-namespace mywebsite.backend
+namespace mywebsite.backend.Service
 {
     public interface IAuthenticationService
     {
@@ -21,5 +18,6 @@ namespace mywebsite.backend
 
         Profile CurrentProfile { get; }
         void UpdateCurrentProfile(Profile profile);
+        void AddAuthToCurrentProfile(AuthenticationResult verifyAuthentication);
     }
 }

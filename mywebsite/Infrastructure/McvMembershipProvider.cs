@@ -8,6 +8,7 @@ using Raven.Client;
 using WebMatrix.WebData;
 using Ninject;
 using mywebsite.backend;
+using mywebsite.backend.Service;
 
 namespace mywebsite.Infrastructure
 {

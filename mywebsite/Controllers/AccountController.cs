@@ -12,15 +12,20 @@ using Raven.Client;
 using mywebsite.App_Start;
 using mywebsite.Infrastructure;
 using mywebsite.backend;
+using mywebsite.backend.Entity;
+using mywebsite.backend.Service;
 
 namespace mywebsite.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
-        private class SessionKeys
+        public class SessionKeys
         {
             public const string CreateProfile = "CreateProfile";
+
+            public const string IsAddingAuth = "IsAddingAuth";
+            public const string AddAuthSuccess = "AddAuthSuccess";
         }
         private readonly IAuthenticationService _authService;
 
@@ -40,21 +45,32 @@ namespace mywebsite.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost]
         public ActionResult RequestAuth(string provider)
         {
-            if (Request.IsAuthenticated)
+            if (Request.IsAuthenticated )
             {
                 return View("Login");
             }
             return new OAuthRequestActionResult(_authService.GetSecurityManager(provider), Url.Action("RequestAuthCallback"));
         }
+
+        [HttpPost]
+        public ActionResult AddAuth(string provider)
+        {
+            
+            Session[SessionKeys.IsAddingAuth] = true;
+            return new OAuthRequestActionResult(_authService.GetSecurityManager(provider), Url.Action("RequestAuthCallback"));
+        }
+
         [AllowAnonymous]
         public ActionResult RequestAuthCallback()
         {
-            if (Request.IsAuthenticated)
+            if (Request.IsAuthenticated && !Session.Bool(SessionKeys.IsAddingAuth))
             {
                 return View("Login");
             }
+            
 
             string providerName = OpenAuthSecurityManager.GetProviderName(HttpContext);
             OpenAuthSecurityManager m = _authService.GetSecurityManager(providerName);
@@ -62,13 +78,23 @@ namespace mywebsite.Controllers
 
             if (verifyAuthentication.IsSuccessful)
             {
-                LoginResponse loginResponse = _authService.Login(verifyAuthentication);
-                if (loginResponse.NewProfileCreated)
+                if (Request.IsAuthenticated && Session.TestAndRemove(SessionKeys.IsAddingAuth))
                 {
-                    Session[SessionKeys.CreateProfile] = true;
+                    _authService.AddAuthToCurrentProfile(verifyAuthentication);
+                    Session[SessionKeys.AddAuthSuccess] = true;
                     return RedirectToAction("Edit");
+
                 }
-                return RedirectToAction("Index", "Home");
+                else
+                {
+                    LoginResponse loginResponse = _authService.Login(verifyAuthentication);
+                    if (loginResponse.NewProfileCreated)
+                    {
+                        Session[SessionKeys.CreateProfile] = true;
+                        return RedirectToAction("Edit");
+                    }
+                    return RedirectToAction("Index", "Home");
+                }
             }
 
 
@@ -78,12 +104,16 @@ namespace mywebsite.Controllers
         public ActionResult Edit()
         {
             
-            if (Session[SessionKeys.CreateProfile] != null)
+            if (Session.TestAndRemove(SessionKeys.CreateProfile))
             {
                 ViewBag.CreateProfile = true;
-                Session.Remove(SessionKeys.CreateProfile);
             }
-            
+
+            if (Session.TestAndRemove(SessionKeys.AddAuthSuccess))
+            {
+                ViewBag.AddAuthSuccess = true;
+            }
+            ViewBag.OtherOauths = _authService.OAuthClients.Where(c => !_authService.CurrentProfile.OAuthIdentities.Select(i => i.Provider).Contains(c.ProviderName)).ToList();
             return View(_authService.CurrentProfile);
         }
 
@@ -119,5 +149,6 @@ namespace mywebsite.Controllers
             Session.Clear();
             return RedirectToAction("Index", "Home");
         }
+
     }
 }
