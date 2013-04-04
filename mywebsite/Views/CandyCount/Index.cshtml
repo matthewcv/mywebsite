@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "CandyCount";
+}
+
+<div id="candyCountApp">
+    
+    <ul>
+        <li>@Html.ActionLink("Index","Index")</li>
+        <li>@Html.ActionLink("Add","Add")</li>
+    </ul>
+    
+</div>
+@section scripts
+{
+    @Scripts.Render("~/bundles/candy")
+    <script>
+
+        $(function() {
+            candyCount.app.start("#candyCountApp");
+        });
+
+    </script>
+}

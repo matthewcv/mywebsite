@@ -1,5 +1,6 @@
 using FluentValidation;
 using mywebsite.backend;
+using mywebsite.backend.Service;
 using mywebsite.backend.Validation;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof(mywebsite.App_Start.NinjectWebCommon), "Start")]
@@ -65,6 +66,8 @@ using Raven.Client.Document;
             kernel.Load<RavenDbModule>();
             kernel.Load<AuthenticationModule>();
             kernel.Load<ValidationModule>();
+
+            kernel.Bind<ICandyService>().To<CandyService>().InRequestScope();
 
         }
     

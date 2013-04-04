@@ -94,7 +94,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entity\Candy.cs" />
+    <Compile Include="Entity\CandyColor.cs" />
+    <Compile Include="Entity\CountedCandy.cs" />
     <Compile Include="Entity\EntityBase.cs" />
+    <Compile Include="Service\CandyService.cs" />
     <Compile Include="Service\LoginResponse.cs" />
     <Compile Include="Service\AuthenticationService.cs" />
     <Compile Include="Service\IAuthenticationService.cs" />
