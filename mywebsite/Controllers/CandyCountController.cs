@@ -30,5 +30,9 @@ namespace mywebsite.Controllers
             return View("Index");
         }
 
+        public ActionResult Stuff()
+        {
+            return View("Index");
+        }
     }
 }

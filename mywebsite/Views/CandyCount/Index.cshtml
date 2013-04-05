@@ -4,11 +4,15 @@
 
 <div id="candyCountApp">
     
-    <ul>
+    <ul id="candyCountLinks">
         <li>@Html.ActionLink("Index","Index")</li>
         <li>@Html.ActionLink("Add","Add")</li>
     </ul>
+    <div data-bind="if: countedCandy">
+        <label>What kind of candy? <select data-bind="options: candyTypes"></select></label>
+    </div>
     
+
 </div>
 @section scripts
 {
