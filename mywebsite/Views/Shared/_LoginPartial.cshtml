@@ -3,8 +3,8 @@
     
     
     <text>
-        @Html.GravatarImage(CurrentProfile.EmailAddress)
-        <ul style="float:left">
+        <div class="pull-left">@Html.GravatarImage(CurrentProfile.EmailAddress)</div>
+        <ul class="unstyled pull-right">
             <li>Hello, @Html.ActionLink(CurrentProfile.DisplayName, "Edit", "Account", routeValues: null, htmlAttributes: new { @class = "username", title = "Manage" })</li>
             <li>        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" })) {
             @Html.AntiForgeryToken()

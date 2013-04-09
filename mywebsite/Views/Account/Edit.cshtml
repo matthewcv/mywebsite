@@ -13,8 +13,8 @@
 }
 
 <div id="accountEdit">
-    <label>What's your name <input type="text" data-bind="value: profile.DisplayName, validate: profile.DisplayName"/> <span class="message-error" data-bind="text: profile.DisplayName.validationMessages" /></label>
-    <label>What's your email address <input type="text" data-bind="value: profile.EmailAddress, validate:profile.EmailAddress"/><span class="message-error" data-bind="text: profile.EmailAddress.validationMessages" /> </label>
+    <label>What's your name <input type="text" data-bind="value: profile.DisplayName, validate: profile.DisplayName"/> <span class="" data-bind="text: profile.DisplayName.validationMessages" /></label>
+    <label>What's your email address <input type="text" data-bind="value: profile.EmailAddress, validate:profile.EmailAddress"/><span class="" data-bind="text: profile.EmailAddress.validationMessages" /> </label>
     <label>Where are you <input type="text" data-bind="value: profile.Location"/> </label>
     <button data-bind="click: saveProfile, disable: saveDisabled() || !isValid() , text: saveText">Save</button><div id="toastr-target"></div>
     
